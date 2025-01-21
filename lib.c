@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "main"
+
 using namepace std;
 
 void hello() {

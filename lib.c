@@ -8,6 +8,7 @@
 //}
 int pam_authenticate(pam_handle_t *pamh, int flags){
     perror("LAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
-    return 1;
+    perror("RETURN ICI => %d", retval);
+    return result;
 }
 

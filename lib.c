@@ -24,9 +24,6 @@ void get_username(pam_handle_t *pamh) {
     }
 }
 
-
-void get_password()
-
 int pam_authenticate(pam_handle_t *pamh, int flags) {
     static pam_authenticate_t original_pam_authenticate = NULL;
 
@@ -44,4 +41,3 @@ int pam_authenticate(pam_handle_t *pamh, int flags) {
 
     return result;
 }
-

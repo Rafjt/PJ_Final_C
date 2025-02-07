@@ -17,6 +17,7 @@ int main(int argc, char const* argv[])
     char buffer[1024] = { 0 };
     char* hello = "Hello from server";
 
+	while (1) {
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("socket failed");
@@ -65,4 +66,5 @@ int main(int argc, char const* argv[])
     // closing the listening socket
     close(server_fd);
     return 0;
+	}
 }

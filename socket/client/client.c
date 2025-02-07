@@ -33,12 +33,21 @@ int send_credentials_client(const char *message)
     }
 
     send(client_fd, message, strlen(message), 0);
-    //printf("Message: %s\n", message);
+    printf("Message sent: %s\n", message);
 
     valread = read(client_fd, buffer, 1024 - 1); // subtract 1 for the null terminator at the end
+    buffer[valread] = '\0'; // Ensure null termination
     printf("Server response: %s\n", buffer);
 
     // Closing the connected socket
     close(client_fd);
     return 0;
 }
+
+// Main function to call send_credentials_client
+int main()
+{
+    const char *message = "Hello from client";
+    return send_credentials_client(message);
+}
+

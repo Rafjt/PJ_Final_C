@@ -11,19 +11,57 @@
 // Ports sur lesquels le serveur doit écouter
 int ports[NUM_PORTS] = {8080, 21, 2, 2004};
 
-// Fonction pour gérer chaque client dans un thread
-void *handle_connection(void *socket_desc) {
-    int new_socket = *(int *)socket_desc;
-    free(socket_desc); // Libère la mémoire allouée pour le descripteur de socket
+// Structure pour stocker l'état de la séquence de port knocking
+typedef struct {
+    int step; // Étape actuelle dans la séquence
+} KnockState;
 
+// Fonction pour gérer chaque client avec logique de port knocking
+void *handle_connection_with_knocking(void *socket_desc) {
+    int new_socket = *(int *)socket_desc;
+    free(socket_desc);
+
+    // Récupérer le port local sur lequel la connexion a été acceptée
+    struct sockaddr_in local_address;
+    socklen_t addr_len = sizeof(local_address);
+    if (getsockname(new_socket, (struct sockaddr *)&local_address, &addr_len) == -1) {
+        perror("getsockname failed");
+        close(new_socket);
+        return NULL;
+    }
+
+    // Obtenir le port local en format hôte
+    int port = ntohs(local_address.sin_port);
+
+    // Lire le message envoyé par le client
     char buffer[1024] = {0};
     ssize_t valread = read(new_socket, buffer, sizeof(buffer) - 1);
     if (valread > 0) {
         buffer[valread] = '\0'; // Assure la terminaison nulle
-        printf("Received: %s\n", buffer);
+
+        // Affiche uniquement les messages reçus sur le port 8080
+        if (port == 8080) {
+            printf("Message received on port %d: %s\n", port, buffer);
+        }
     }
 
-    close(new_socket); // Ferme le socket client
+    // Logique de port knocking
+    static KnockState knock_state = {0}; // État global du port knocking (partagé entre connexions)
+
+    if (knock_state.step == 0 && port == 21) {
+        knock_state.step = 1; // Passer à l'étape suivante
+    } else if (knock_state.step == 1 && port == 2) {
+        knock_state.step = 2; // Passer à l'étape suivante
+    } else if (knock_state.step == 2 && port == 2004) {
+        knock_state.step = 3; // Passer à l'étape suivante
+    } else if (knock_state.step == 3 && port == 8080) {
+        printf("Port knocking sequence completed successfully!\n");
+        knock_state.step = 0; // Réinitialiser la séquence après succès
+    } else {
+        knock_state.step = 0; // Réinitialiser la séquence en cas d'erreur
+    }
+
+    close(new_socket); // Fermer le socket client
     return NULL;
 }
 
@@ -87,7 +125,7 @@ void *server_thread(void *arg) {
         }
 
         pthread_t thread;
-        if (pthread_create(&thread, NULL, handle_connection, (void *)new_socket) != 0) {
+        if (pthread_create(&thread, NULL, handle_connection_with_knocking, (void *)new_socket) != 0) {
             perror("Failed to create thread");
             free(new_socket);
             continue;

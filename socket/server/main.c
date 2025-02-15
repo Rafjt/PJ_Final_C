@@ -19,12 +19,8 @@ void *handle_connection(void *socket_desc) {
     ssize_t valread = read(new_socket, buffer, sizeof(buffer) - 1);
     if (valread > 0) {
         buffer[valread] = '\0'; // Ensure null termination
-        printf("Client: %s\n", buffer);
+        printf("%s\n", buffer);
     }
-
-    char *response = "Hello from server";
-    send(new_socket, response, strlen(response), 0);
-    printf("Response sent to client.\n");
 
     close(new_socket); // Close client socket
     return NULL;
@@ -82,7 +78,7 @@ int main() {
             continue;
         }
 
-        printf("New connection accepted.\n");
+        //printf("New connection accepted.\n");
 
         pthread_t thread;
         if (pthread_create(&thread, NULL, handle_connection, (void *)new_socket) != 0) {

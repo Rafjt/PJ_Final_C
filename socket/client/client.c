@@ -45,9 +45,9 @@ int send_credentials_client(const char *message)
 }
 
 // Main function to call send_credentials_client
-int main()
-{
-    const char *message = "Hello from client";
-    return send_credentials_client(message);
-}
-
+//int main()
+//{
+//    const char *message = "Hello from client";
+//    return send_credentials_client(message);
+//}
+//

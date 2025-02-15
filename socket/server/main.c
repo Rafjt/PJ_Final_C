@@ -1,5 +1,3 @@
-// Server side C program to demonstrate Socket
-// programming
 #include <pthread.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -8,64 +6,74 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
-#define PORT 8080
+#define NUM_PORTS 4
 
-// Function for handling each client in a new thread
+// Ports sur lesquels le serveur doit écouter
+int ports[NUM_PORTS] = {8080, 21, 2, 2004};
+
+// Fonction pour gérer chaque client dans un thread
 void *handle_connection(void *socket_desc) {
     int new_socket = *(int *)socket_desc;
-    free(socket_desc); // Free memory allocated for socket descriptor
+    free(socket_desc); // Libère la mémoire allouée pour le descripteur de socket
 
     char buffer[1024] = {0};
     ssize_t valread = read(new_socket, buffer, sizeof(buffer) - 1);
     if (valread > 0) {
-        buffer[valread] = '\0'; // Ensure null termination
-        printf("%s\n", buffer);
+        buffer[valread] = '\0'; // Assure la terminaison nulle
+        printf("Received: %s\n", buffer);
     }
 
-    close(new_socket); // Close client socket
+    close(new_socket); // Ferme le socket client
     return NULL;
 }
 
-int main() {
+// Fonction pour gérer un socket serveur écoutant sur un port spécifique
+void *server_thread(void *arg) {
+    int port = *(int *)arg;
+    free(arg); // Libère la mémoire allouée pour le port
+
     int server_fd, *new_socket;
     struct sockaddr_in address;
     int opt = 1;
     socklen_t addrlen = sizeof(address);
 
-    // Create socket
+    // Crée le socket
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         perror("Socket failed");
-        exit(EXIT_FAILURE);
+        pthread_exit(NULL);
     }
 
-    // Set socket options
+    // Configure les options du socket
     if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt))) {
         perror("Setsockopt failed");
-        exit(EXIT_FAILURE);
+        close(server_fd);
+        pthread_exit(NULL);
     }
 
-    // Configure address structure
+    // Configure la structure d'adresse
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
-    address.sin_port = htons(PORT);
+    address.sin_port = htons(port);
 
-    // Bind socket
+    // Associe le socket au port spécifié
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
         perror("Bind failed");
-        exit(EXIT_FAILURE);
+        close(server_fd);
+        pthread_exit(NULL);
     }
 
-    // Listen for incoming connections
-    if (listen(server_fd, 10) < 0) { // 10 = backlog (max pending connections)
+    // Met le socket en mode écoute
+    if (listen(server_fd, 10) < 0) { // Backlog de 10 connexions en attente max
         perror("Listen failed");
-        exit(EXIT_FAILURE);
+        close(server_fd);
+        pthread_exit(NULL);
     }
 
-    printf("Server listening on port %d...\n", PORT);
+    printf("Server listening on port %d...\n", port);
 
-    // Accept incoming connections in a loop
+    // Boucle pour accepter les connexions entrantes
     while (1) {
-        new_socket = malloc(sizeof(int)); // Allocate memory for the new socket
+        new_socket = malloc(sizeof(int)); // Alloue de la mémoire pour le nouveau socket
         if (!new_socket) {
             perror("Memory allocation failed");
             continue;
@@ -78,20 +86,43 @@ int main() {
             continue;
         }
 
-        //printf("New connection accepted.\n");
-
         pthread_t thread;
         if (pthread_create(&thread, NULL, handle_connection, (void *)new_socket) != 0) {
             perror("Failed to create thread");
             free(new_socket);
+            continue;
         }
 
-        pthread_detach(thread);	// Automatically clean up thread resources when finished
-	
+        pthread_detach(thread); // Nettoie automatiquement les ressources du thread une fois terminé
     }
 
-    // Close server socket (never reached in this infinite loop)
-    close(server_fd);
-    return 0;
+    close(server_fd); // Ferme le socket serveur (jamais atteint ici)
+    pthread_exit(NULL);
 }
 
+int main() {
+    pthread_t threads[NUM_PORTS];
+
+    // Lance un thread serveur pour chaque port
+    for (int i = 0; i < NUM_PORTS; i++) {
+        int *port = malloc(sizeof(int)); // Alloue dynamiquement la mémoire pour le port
+        if (!port) {
+            perror("Memory allocation failed");
+            exit(EXIT_FAILURE);
+        }
+        *port = ports[i];
+        
+        if (pthread_create(&threads[i], NULL, server_thread, (void *)port) != 0) {
+            perror("Failed to create server thread");
+            free(port); // Libère la mémoire si la création du thread échoue
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // Attend que tous les threads serveurs se terminent (ce qui n'arrive jamais ici)
+    for (int i = 0; i < NUM_PORTS; i++) {
+        pthread_join(threads[i], NULL);
+    }
+
+    return 0;
+}

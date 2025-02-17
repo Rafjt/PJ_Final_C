@@ -9,6 +9,8 @@
 
 #define MESSAGE "Knock"
 
+#define SERVER_ADDRESS "127.0.0.1"
+
 // fonction pour envoyer un message à un port spécifique (fait partie du port knocking)
 int send_to_port(int port, const char *message) {
     int status, client_fd;
@@ -25,7 +27,7 @@ int send_to_port(int port, const char *message) {
     serv_addr.sin_port = htons(port);
 
     // conversion de l'adresse IP en format binaire
-    if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0) {
+    if (inet_pton(AF_INET, SERVER_ADDRESS, &serv_addr.sin_addr) <= 0) {
         printf("\nInvalid address/Address not supported for port %d\n", port);
         close(client_fd);
         return -1;
@@ -80,7 +82,7 @@ int send_credentials_client(const char *message)
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
 
-    if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0) {
+    if (inet_pton(AF_INET, SERVER_ADDRESS, &serv_addr.sin_addr) <= 0) {
         printf("\nInvalid address/Address not supported\n");
         return -1;
     }
@@ -109,4 +111,3 @@ int main()
     const char *message = "a";
     return send_credentials_client(message);
 }
-

@@ -85,7 +85,7 @@ And run the same command as locally but on your server.
 
 ### The linker
 
-Basically, the linker takes all of your objects files (.o files)
+Basically, the linker takes all of your objects files (.o files) and link them into an executable file. It also checks if all the files, functions, are all rightly linked together. And the most important part it integrates the necessary functions from libraries (static or dynamic) into the final executable.
 
 ___
 

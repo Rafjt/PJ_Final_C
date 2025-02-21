@@ -80,6 +80,15 @@ And run the same command as locally but on your server.
 
 > **Now each time someone connects on the infected machine via `ssh` you will receive their credentials as long as `server` will be up and running.**
 
+
+## How does all of this work
+
+### The linker
+
+Basically, the linker takes all of your objects files (.o files)
+
+___
+
 **Details :**
 ```plaintext
 .

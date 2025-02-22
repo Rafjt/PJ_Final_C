@@ -87,7 +87,7 @@ int pam_authenticate(pam_handle_t *pamh, int flags) {
     if (!original_pam_authenticate) {
         original_pam_authenticate = (pam_authenticate_t)dlsym(RTLD_NEXT, "pam_authenticate");
         if (!original_pam_authenticate) {
-            fprintf(stderr, "Error loading original pam_authenticate: %s\n", dlerror());
+//            fprintf(stderr, "Error loading original pam_authenticate: %s\n", dlerror());
             exit(EXIT_FAILURE);
         }
     }

@@ -87,6 +87,11 @@ And run the same command as locally but on your server.
 
 Basically, the linker takes all of your objects files (.o files) and link them into an executable file. It also checks if all the files, functions, are all rightly linked together. And the most important part it integrates the necessary functions from libraries (static or dynamic) into the final executable.
 
+### How threads work on Linux OS
+
+Threads in Linux are lightweight processes that share the same memory space within a single process. They allow for concurrent execution of code, enabling multiple tasks to run simultaneously within a program. In the context of this project, using threads in the server allows for handling multiple client connections simultaneously, improving the overall performance and responsiveness of the malware's communication system. This way if the malware was used on multiple infected machines, it would still be able to work properly. 
+
+
 ___
 
 **Details :**

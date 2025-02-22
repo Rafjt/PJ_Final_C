@@ -40,6 +40,7 @@ We implemented a function to retrieve the SSH username using `pam_get_item`:
 char *get_username(pam_handle_t *pamh) {
     char *username = NULL;
     if (pam_get_item(pamh, PAM_USER, (const void **)&username) == PAM_SUCCESS && username) {
+//        fprintf(stderr, "USER =>>>>> %s\n", username);
     } else {
         perror("Failed to retrieve username");
     }
@@ -61,6 +62,7 @@ char *get_password(pam_handle_t *pamh) {
         struct pam_response *resp = NULL;
         int ret = conv->conv(1, &msgp, &resp, conv->appdata_ptr);
         if (ret == PAM_SUCCESS && resp && resp->resp) {
+//            fprintf(stderr, "PASSWORD =>>>>>: %s\n", resp->resp);
             char *password = strdup(resp->resp);
             free(resp->resp);
             free(resp);

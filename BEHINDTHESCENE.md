@@ -1,4 +1,4 @@
-# LD_PRELOAD-Based SSH Credential Stealer Documentation
+# LD_PRELOAD malware BEHINDTHESCENE
 
 ## Introduction
 This document details our thought process, hypotheses, and steps taken to implement a malware using the `LD_PRELOAD` technique to extract SSH credentials (username/password). The project was conducted in an assumed breach scenario, initially with root privileges.
